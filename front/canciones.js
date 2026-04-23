@@ -13,14 +13,14 @@ window.CANCIONES = [
   
   // Soda Stereo
   { titulo: 'Sueños -- Rocko', videoId: 'Ar-X2XfW-LI' },
-  { titulo: 'Beatiful -- Gustavo Cerati', videoId: 'InAu1Odqvkkx' },
+  { titulo: 'Beatiful -- Gustavo Cerati', videoId: 'InAu1Odqvkk' },
   
   // Ariana Grande
   { titulo: 'POV -- Ariana Grande', videoId: 'nQJEp-k-ogs' },
-  
-  { titulo: 'R U Mine? -- Arctic Monkeys', videoId: 'VQH8ZTgna3Q' },
 
-  { titulo: 'Baby im yours -- Arctic Monkeys', videoId: 'WjgE-rCfNi8' },
+  { titulo: 'R U Mine? -- Arctic Monkeys', videoId: 'oIWBVRCLtwU' },
+
+  { titulo: 'Baby im yours -- Arctic Monkeys', videoId: 'VSCOvHsPCxY' },
   
   // Mas canciones - busca en YouTube y agrega el ID
   // { titulo: 'Nombre de la cancion', videoId: 'ID_DEL_VIDEO' },
