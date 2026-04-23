@@ -25,6 +25,7 @@
   const $btnNew = document.getElementById('btn-nueva');
   const $btnDay = document.getElementById('btn-hoy');
   const $tabs   = document.querySelectorAll('.pestana');
+  const $saludo = document.querySelector('.saludo');
 
   let tipoActual = 'motivacional';
 
@@ -55,11 +56,69 @@
     return f;
   }
 
+  function obtenerSaludo() {
+    // Obtener hora en Bogotá
+    const ahora = new Date();
+    const horaStr = new Intl.DateTimeFormat('es-CO', {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false,
+      timeZone: 'America/Bogota'
+    }).format(ahora);
+    
+    const [hora, minutos] = horaStr.split(':').map(Number);
+    const horaDecimal = hora + (minutos / 60);
+    
+    // 6:00 AM - 11:59 AM = Buenos días
+    // 12:00 PM - 6:29 PM = Buenas tardes
+    // 6:30 PM - 5:59 AM = Buenas noches
+    
+    if (horaDecimal >= 6 && horaDecimal < 12) {
+      return 'Buenos días';
+    } else if (horaDecimal >= 12 && horaDecimal < 18.5) {
+      return 'Buenas tardes';
+    } else {
+      return 'Buenas noches';
+    }
+  }
+  
+  function actualizarSaludo() {
+    if (!$saludo) return;
+    const saludo = obtenerSaludo();
+    $saludo.innerHTML = `${saludo}, Sol <span class="corazon" aria-hidden="true">&#9829;</span>`;
+  }
+  
   function renderFecha() {
-    const fmt = new Intl.DateTimeFormat('es-ES', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    // Obtener fecha y hora en horario de Bogotá (GMT-5)
+    const ahora = new Date();
+    
+    // Formato de fecha
+    const fmtFecha = new Intl.DateTimeFormat('es-CO', {
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      timeZone: 'America/Bogota'
     });
-    $fecha.textContent = fmt.format(new Date());
+    
+    // Formato de hora
+    const fmtHora = new Intl.DateTimeFormat('es-CO', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+      timeZone: 'America/Bogota'
+    });
+    
+    const fecha = fmtFecha.format(ahora);
+    const hora = fmtHora.format(ahora);
+    
+    $fecha.textContent = `${fecha} • ${hora}`;
+  }
+  
+  function actualizarHora() {
+    renderFecha();
+    actualizarSaludo();
   }
 
   function mostrarFrase(frase) {
@@ -131,10 +190,16 @@
 
   function init() {
     renderFecha();
+    actualizarSaludo();
     actualizarEtiqueta();
     mostrarFrase(fraseDelDia());
     bindEvents();
     iniciarParticulas();
+    
+    // Actualizar hora y saludo cada segundo
+    setInterval(actualizarHora, 1000);
+    
+    // Rotar frases cada 45 segundos
     setInterval(() => mostrarFrase(fraseAleatoria(textoActual())), INTERVALO_AUTO_MS);
   }
 

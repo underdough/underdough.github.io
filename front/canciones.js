@@ -8,16 +8,19 @@
 /* eslint-disable */
 window.CANCIONES = [
   // Gustavo Cerati - IDs verificados que funcionan
-  { titulo: 'Amor Amarillo', videoId: 'iluWuweGX7s' },
-  { titulo: 'Gongoli -- Alvaro Diaz', videoId: 'MEHn16TE-_s' },
+  { titulo: 'Amor Amarillo - Gustavo Cerati', videoId: 'iluWuweGX7s' },
+  { titulo: 'Gongoli -- Alvaro Diaz', videoId: 'SlrxMRjY0zs' },
   
   // Soda Stereo
   { titulo: 'Sueños -- Rocko', videoId: 'Ar-X2XfW-LI' },
-  { titulo: 'En la Ciudad de la Furia -- Soda Stereo', videoId: 'xAZH28KpK1E' },
+  { titulo: 'Beatiful -- Gustavo Cerati', videoId: 'InAu1Odqvkkx' },
   
   // Ariana Grande
   { titulo: 'POV -- Ariana Grande', videoId: 'nQJEp-k-ogs' },
-  { titulo: 'thank u, next -- Ariana Grande', videoId: 'gl1aHhXnN1k' },
+  
+  { titulo: 'R U Mine? -- Arctic Monkeys', videoId: 'VQH8ZTgna3Q' },
+
+  { titulo: 'Baby im yours -- Arctic Monkeys', videoId: 'WjgE-rCfNi8' },
   
   // Mas canciones - busca en YouTube y agrega el ID
   // { titulo: 'Nombre de la cancion', videoId: 'ID_DEL_VIDEO' },
