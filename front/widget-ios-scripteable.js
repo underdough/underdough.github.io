@@ -20,7 +20,7 @@
    ===================================================== */
 
 // URL de tu sitio en GitHub Pages
-const SITIO_URL = "https://underdough.github.io/";
+const SITIO_URL = "https://underdough.github.io/index";
 
 // Configuración de colores (ajusta según tu diseño)
 const COLOR_FONDO = new Color("#5c1a2b");
