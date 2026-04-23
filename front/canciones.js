@@ -17,6 +17,7 @@ window.CANCIONES = [
   
   // Ariana Grande
   { titulo: 'POV -- Ariana Grande', videoId: 'nQJEp-k-ogs' },
+  { titulo: 'Tattooed Heart -- Ariana Grande', videoId: 'NaZXwYjal8E' },
 
   { titulo: 'R U Mine? -- Arctic Monkeys', videoId: 'oIWBVRCLtwU' },
 
