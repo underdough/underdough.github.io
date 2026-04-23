@@ -1,208 +1,266 @@
 /* =====================================================
-   app.js -- logica de la pagina para Sol.
-   Pestanas motivacional / romantica + frase del dia
-   determinista + rotacion automatica + particulas.
-
-   Requiere:
-     - window.FRASES   (frases.js)
-     - tsParticles     (CDN)
+   app.js -- lógica principal para Sol
+   Saludo dinámico, hora de Bogotá, frases del día
    ===================================================== */
 
 (function () {
   'use strict';
 
-  const INTERVALO_AUTO_MS = 45000;
-  const DURACION_FADE_MS  = 400;
+  const FRASES = window.FRASES || { motivacional: [], romantica: [] };
 
-  const FRASES = (window.FRASES && typeof window.FRASES === 'object')
-    ? window.FRASES
-    : { motivacional: [], romantica: [] };
-
-  const $fecha  = document.getElementById('fecha');
-  const $frase  = document.getElementById('frase');
-  const $autor  = document.getElementById('autor');
-  const $etiq   = document.getElementById('etiqueta-tipo');
-  const $btnNew = document.getElementById('btn-nueva');
-  const $btnDay = document.getElementById('btn-hoy');
-  const $tabs   = document.querySelectorAll('.pestana');
-  const $saludo = document.querySelector('.saludo');
+  const $saludo      = document.querySelector('.saludo');
+  const $fecha       = document.getElementById('fecha');
+  const $etiquetaTipo = document.getElementById('etiqueta-tipo');
+  const $frase       = document.getElementById('frase');
+  const $autor       = document.getElementById('autor');
+  const $tabMotiv    = document.getElementById('tab-motiv');
+  const $tabRomant   = document.getElementById('tab-romant');
+  const $btnNueva    = document.getElementById('btn-nueva');
+  const $btnHoy      = document.getElementById('btn-hoy');
 
   let tipoActual = 'motivacional';
 
-  function diaDelAno(f) {
-    f = f || new Date();
-    const inicio = new Date(f.getFullYear(), 0, 0);
-    return Math.floor((f - inicio) / 86400000);
-  }
-
-  function listaActual() {
-    return Array.isArray(FRASES[tipoActual]) ? FRASES[tipoActual] : [];
-  }
-
-  function fraseDelDia() {
-    const lista = listaActual();
-    if (lista.length === 0) return { texto: '', autor: '' };
-    const offset = tipoActual === 'romantica' ? 7 : 0;
-    return lista[(diaDelAno() + offset) % lista.length];
-  }
-
-  function fraseAleatoria(actualTxt) {
-    const lista = listaActual();
-    if (lista.length === 0) return { texto: '', autor: '' };
-    if (lista.length === 1) return lista[0];
-    let f;
-    do { f = lista[Math.floor(Math.random() * lista.length)]; }
-    while (f.texto === actualTxt);
-    return f;
-  }
-
-  function obtenerSaludo() {
-    // Obtener hora en Bogotá
+  /* =====================================================
+     SALUDO Y HORA DE BOGOTÁ (GMT-5)
+     ===================================================== */
+  function actualizarSaludoYHora() {
     const ahora = new Date();
-    const horaStr = new Intl.DateTimeFormat('es-CO', {
+    
+    // Convertir a hora de Bogotá (GMT-5)
+    const opciones = { 
+      timeZone: 'America/Bogota',
       hour: 'numeric',
       minute: 'numeric',
-      hour12: false,
-      timeZone: 'America/Bogota'
-    }).format(ahora);
+      hour12: false
+    };
     
+    const horaStr = ahora.toLocaleString('es-CO', opciones);
     const [hora, minutos] = horaStr.split(':').map(Number);
     const horaDecimal = hora + (minutos / 60);
     
+    // Determinar saludo según la hora
     // 5:30 AM - 11:59 AM = Buenos días
     // 12:00 PM - 6:29 PM = Buenas tardes
     // 6:30 PM - 5:29 AM = Buenas noches
+    let saludo = 'Buenas noches';
     
     if (horaDecimal >= 5.5 && horaDecimal < 12) {
-      return 'Buenos días';
+      saludo = 'Buenos días';
     } else if (horaDecimal >= 12 && horaDecimal < 18.5) {
-      return 'Buenas tardes';
-    } else {
-      return 'Buenas noches';
+      saludo = 'Buenas tardes';
+    }
+    
+    if ($saludo) {
+      $saludo.innerHTML = `${saludo}, Sol <span class="corazon" aria-hidden="true">&#9829;</span>`;
+    }
+    
+    // Actualizar fecha y hora completa
+    if ($fecha) {
+      const opcionesFecha = {
+        timeZone: 'America/Bogota',
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      };
+      
+      const fechaCompleta = ahora.toLocaleString('es-CO', opcionesFecha);
+      $fecha.textContent = fechaCompleta;
     }
   }
-  
-  function actualizarSaludo() {
-    if (!$saludo) return;
-    const saludo = obtenerSaludo();
-    $saludo.innerHTML = `${saludo}, Sol <span class="corazon" aria-hidden="true">&#9829;</span>`;
-  }
-  
-  function renderFecha() {
-    // Obtener fecha y hora en horario de Bogotá (GMT-5)
+
+  /* =====================================================
+     FRASES
+     ===================================================== */
+  function obtenerFraseDelDia(tipo) {
+    const lista = FRASES[tipo] || [];
+    if (lista.length === 0) return { texto: 'Cargando...', autor: '' };
+    
+    // Usar el día del año para obtener siempre la misma frase cada día
     const ahora = new Date();
+    const inicio = new Date(ahora.getFullYear(), 0, 0);
+    const diff = ahora - inicio;
+    const diaDelAno = Math.floor(diff / 86400000);
     
-    // Formato de fecha
-    const fmtFecha = new Intl.DateTimeFormat('es-CO', {
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      timeZone: 'America/Bogota'
-    });
+    // Offset diferente para cada tipo para que no coincidan
+    const offset = tipo === 'romantica' ? 7 : 0;
+    const indice = (diaDelAno + offset) % lista.length;
     
-    // Formato de hora
-    const fmtHora = new Intl.DateTimeFormat('es-CO', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true,
-      timeZone: 'America/Bogota'
-    });
-    
-    const fecha = fmtFecha.format(ahora);
-    const hora = fmtHora.format(ahora);
-    
-    $fecha.textContent = `${fecha} • ${hora}`;
-  }
-  
-  function actualizarHora() {
-    renderFecha();
-    actualizarSaludo();
+    return lista[indice];
   }
 
-  function mostrarFrase(frase) {
-    $frase.classList.add('fade-out');
-    $autor.classList.remove('visible');
-    setTimeout(() => {
-      $frase.textContent = '"' + frase.texto + '"';
-      $autor.textContent = frase.autor ? '-- ' + frase.autor : '';
-      $frase.classList.remove('fade-out');
-      if (frase.autor) $autor.classList.add('visible');
-    }, DURACION_FADE_MS);
+  function obtenerFraseAleatoria(tipo) {
+    const lista = FRASES[tipo] || [];
+    if (lista.length === 0) return { texto: 'Cargando...', autor: '' };
+    
+    const indice = Math.floor(Math.random() * lista.length);
+    return lista[indice];
   }
 
-  function textoActual() {
-    return ($frase.textContent || '').replace(/^["]|["]$/g, '');
+  function mostrarFrase(fraseObj, animacion = true) {
+    if (!$frase || !$autor) return;
+    
+    if (animacion) {
+      $frase.classList.add('fade-out');
+      $autor.classList.remove('visible');
+      
+      setTimeout(() => {
+        $frase.textContent = fraseObj.texto;
+        $autor.textContent = fraseObj.autor ? `— ${fraseObj.autor}` : '';
+        
+        $frase.classList.remove('fade-out');
+        if (fraseObj.autor) {
+          setTimeout(() => $autor.classList.add('visible'), 300);
+        }
+      }, 400);
+    } else {
+      $frase.textContent = fraseObj.texto;
+      $autor.textContent = fraseObj.autor ? `— ${fraseObj.autor}` : '';
+      if (fraseObj.autor) {
+        $autor.classList.add('visible');
+      }
+    }
   }
 
-  function actualizarEtiqueta() {
-    $etiq.textContent = tipoActual === 'motivacional'
-      ? 'Tu motivacion de hoy'
-      : 'Tu mensaje de amor de hoy';
-  }
-
-  function cambiarTab(nuevoTipo) {
-    if (!(nuevoTipo in FRASES)) return;
+  function cambiarTipo(nuevoTipo) {
+    if (nuevoTipo === tipoActual) return;
+    
     tipoActual = nuevoTipo;
-    $tabs.forEach((b) => {
-      const activa = b.dataset.tipo === nuevoTipo;
-      b.classList.toggle('activa', activa);
-      b.setAttribute('aria-selected', String(activa));
-    });
-    actualizarEtiqueta();
-    mostrarFrase(fraseDelDia());
+    
+    // Actualizar pestañas
+    if ($tabMotiv && $tabRomant) {
+      $tabMotiv.classList.toggle('activa', tipoActual === 'motivacional');
+      $tabRomant.classList.toggle('activa', tipoActual === 'romantica');
+      
+      $tabMotiv.setAttribute('aria-selected', String(tipoActual === 'motivacional'));
+      $tabRomant.setAttribute('aria-selected', String(tipoActual === 'romantica'));
+    }
+    
+    // Actualizar etiqueta
+    if ($etiquetaTipo) {
+      $etiquetaTipo.textContent = tipoActual === 'romantica' 
+        ? 'Un mensaje para ti' 
+        : 'Tu motivación de hoy';
+    }
+    
+    // Mostrar frase del día del nuevo tipo
+    const frase = obtenerFraseDelDia(tipoActual);
+    mostrarFrase(frase, true);
   }
 
-  function bindEvents() {
-    $btnNew.addEventListener('click', () => mostrarFrase(fraseAleatoria(textoActual())));
-    $btnDay.addEventListener('click', () => mostrarFrase(fraseDelDia()));
-    $tabs.forEach((b) => b.addEventListener('click', () => cambiarTab(b.dataset.tipo)));
+  /* =====================================================
+     EVENTOS
+     ===================================================== */
+  function bindEventos() {
+    if ($tabMotiv) {
+      $tabMotiv.addEventListener('click', () => cambiarTipo('motivacional'));
+    }
+    
+    if ($tabRomant) {
+      $tabRomant.addEventListener('click', () => cambiarTipo('romantica'));
+    }
+    
+    if ($btnNueva) {
+      $btnNueva.addEventListener('click', () => {
+        const frase = obtenerFraseAleatoria(tipoActual);
+        mostrarFrase(frase, true);
+      });
+    }
+    
+    if ($btnHoy) {
+      $btnHoy.addEventListener('click', () => {
+        const frase = obtenerFraseDelDia(tipoActual);
+        mostrarFrase(frase, true);
+      });
+    }
   }
 
+  /* =====================================================
+     PARTÍCULAS (tsParticles)
+     ===================================================== */
   function iniciarParticulas() {
     if (typeof tsParticles === 'undefined') return;
+    
     tsParticles.load('tsparticles', {
-      fullScreen: { enable: false },
-      background: { color: 'transparent' },
-      fpsLimit: 60,
+      fullScreen: false,
       particles: {
-        number:  { value: 45, density: { enable: true, area: 900 } },
-        color:   { value: ['#f7c9d3', '#e88fa3', '#fce4ec', '#d4af7a'] },
-        shape:   { type: 'circle' },
-        opacity: { value: { min: 0.2, max: 0.7 }, animation: { enable: true, speed: 0.6, sync: false } },
-        size:    { value: { min: 1, max: 4 },    animation: { enable: true, speed: 2,   sync: false } },
-        move: {
-          enable: true, direction: 'top',
-          speed:  { min: 0.3, max: 1.2 },
-          random: true, straight: false,
-          outModes: { default: 'out' }
+        number: {
+          value: 60,
+          density: {
+            enable: true,
+            area: 800
+          }
         },
-        links: { enable: false }
+        color: {
+          value: ['#f7c9d3', '#e88fa3', '#d4af7a']
+        },
+        shape: {
+          type: 'circle'
+        },
+        opacity: {
+          value: { min: 0.1, max: 0.5 },
+          animation: {
+            enable: true,
+            speed: 0.5,
+            sync: false
+          }
+        },
+        size: {
+          value: { min: 1, max: 4 }
+        },
+        move: {
+          enable: true,
+          speed: 0.5,
+          direction: 'none',
+          random: true,
+          straight: false,
+          outModes: 'out'
+        }
       },
       interactivity: {
-        events: { onHover: { enable: true, mode: 'bubble' } },
-        modes:  { bubble: { distance: 120, size: 6, duration: 2, opacity: 0.9 } }
+        events: {
+          onHover: {
+            enable: true,
+            mode: 'bubble'
+          }
+        },
+        modes: {
+          bubble: {
+            distance: 150,
+            size: 6,
+            duration: 2,
+            opacity: 0.8
+          }
+        }
       },
       detectRetina: true
     });
   }
 
+  /* =====================================================
+     INICIALIZACIÓN
+     ===================================================== */
   function init() {
-    renderFecha();
-    actualizarSaludo();
-    actualizarEtiqueta();
-    mostrarFrase(fraseDelDia());
-    bindEvents();
-    iniciarParticulas();
+    // Actualizar saludo y hora inmediatamente
+    actualizarSaludoYHora();
     
-    // Actualizar hora y saludo cada segundo
-    setInterval(actualizarHora, 1000);
+    // Actualizar cada segundo
+    setInterval(actualizarSaludoYHora, 1000);
     
-    // Rotar frases cada 45 segundos
-    setInterval(() => mostrarFrase(fraseAleatoria(textoActual())), INTERVALO_AUTO_MS);
+    // Mostrar frase del día inicial
+    const fraseInicial = obtenerFraseDelDia(tipoActual);
+    mostrarFrase(fraseInicial, false);
+    
+    // Bind eventos
+    bindEventos();
+    
+    // Iniciar partículas
+    setTimeout(iniciarParticulas, 100);
   }
 
+  // Ejecutar cuando el DOM esté listo
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
