@@ -69,11 +69,11 @@
     const [hora, minutos] = horaStr.split(':').map(Number);
     const horaDecimal = hora + (minutos / 60);
     
-    // 6:00 AM - 11:59 AM = Buenos días
+    // 5:30 AM - 11:59 AM = Buenos días
     // 12:00 PM - 6:29 PM = Buenas tardes
-    // 6:30 PM - 5:59 AM = Buenas noches
+    // 6:30 PM - 5:29 AM = Buenas noches
     
-    if (horaDecimal >= 6 && horaDecimal < 12) {
+    if (horaDecimal >= 5.5 && horaDecimal < 12) {
       return 'Buenos días';
     } else if (horaDecimal >= 12 && horaDecimal < 18.5) {
       return 'Buenas tardes';
