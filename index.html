@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Un recordatorio diario, con amor, para Sol." />
   <meta name="theme-color" content="#5c1a2b" />
-  <title>Para ti, Sol ✿</title>
+  <title>Para ti, Sol</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,22 +13,18 @@
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Dancing+Script:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
     rel="stylesheet"
   />
+  <link rel="icon" type="image/x-icon" href="components/favicon.ico">
 
   <link rel="stylesheet" href="components/styles.css" />
 </head>
 <body>
 
-  <!-- Nombre de Sol como marca de agua -->
-  <div class="fondo-sol" aria-hidden="true">
-    <span>Sol</span>
-  </div>
+  <div class="fondo-sol" aria-hidden="true"><span>Sol</span></div>
 
-  <!-- Capa de partículas (pétalos) generada por tsParticles -->
   <div id="tsparticles" aria-hidden="true"></div>
 
-  <!-- Flores de loto decorativas en SVG -->
   <div class="loto-container" aria-hidden="true">
-    <svg class="loto" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
       <defs>
         <radialGradient id="lotoGrad" cx="50%" cy="60%" r="50%">
           <stop offset="0%"   stop-color="#fce4ec" stop-opacity="0.9" />
@@ -36,11 +32,6 @@
           <stop offset="100%" stop-color="#5c1a2b" stop-opacity="0.5" />
         </radialGradient>
       </defs>
-      <use href="#loto-base" />
-    </svg>
-
-    <!-- Plantilla reusable del loto (8 pétalos radiales) -->
-    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
       <symbol id="loto-base" viewBox="0 0 100 100">
         <g transform="translate(50 55)">
           <g fill="url(#lotoGrad)" stroke="#f7c9d3" stroke-width="0.5" stroke-opacity="0.6">
@@ -58,8 +49,7 @@
         </g>
       </symbol>
     </svg>
-
-    <!-- El resto de los lotos se clonan desde el símbolo anterior -->
+    <svg class="loto" viewBox="0 0 100 100"><use href="#loto-base" /></svg>
     <svg class="loto" viewBox="0 0 100 100"><use href="#loto-base" /></svg>
     <svg class="loto" viewBox="0 0 100 100"><use href="#loto-base" /></svg>
     <svg class="loto" viewBox="0 0 100 100"><use href="#loto-base" /></svg>
@@ -67,56 +57,79 @@
     <svg class="loto" viewBox="0 0 100 100"><use href="#loto-base" /></svg>
   </div>
 
-  <!-- Contenido principal -->
   <main>
     <header>
-      <h1 class="saludo">Buenos días, Sol <span class="corazon" aria-hidden="true">♥</span></h1>
+      <h1 class="saludo">Buenos d&iacute;as, Sol <span class="corazon" aria-hidden="true">&#9829;</span></h1>
       <p class="fecha" id="fecha"></p>
     </header>
 
     <article class="tarjeta" aria-live="polite">
-      <p class="etiqueta">Tu recordatorio de hoy</p>
+      <div class="pestanas" role="tablist" aria-label="Tipo de frase">
+        <button id="tab-motiv" class="pestana activa" role="tab" aria-selected="true" aria-controls="panel-frase" data-tipo="motivacional" type="button">.✦ ݁˖ ;  Motivaci&oacute;n</button>
+        <button id="tab-romant" class="pestana" role="tab" aria-selected="false" aria-controls="panel-frase" data-tipo="romantica" type="button">&#9829; Para ti</button>
+      </div>
 
-      <blockquote class="frase" id="frase">Cargando palabras para ti…</blockquote>
-      <p class="autor" id="autor"></p>
-
-      <p class="firma">— con todo mi amor</p>
-
-      <div class="controles">
-        <button id="btn-nueva" type="button">Otra frase ✿</button>
-        <button id="btn-hoy"   type="button">La de hoy</button>
+      <div id="panel-frase" role="tabpanel" aria-labelledby="tab-motiv">
+        <p class="etiqueta" id="etiqueta-tipo">Tu motivaci&oacute;n de hoy</p>
+        <blockquote class="frase" id="frase">Cargando palabras para ti&hellip;</blockquote>
+        <p class="autor" id="autor"></p>
+        <p class="firma">&mdash; con todo mi corazón</p>
+        <div class="controles">
+          <button id="btn-nueva" type="button">Dale aquí para otra frase</button>
+          <button id="btn-hoy" type="button">La frase de hoy</button>
+        </div>
       </div>
     </article>
 
-    <!-- Reproductor de Spotify -->
     <section class="musica" aria-label="Banda sonora para Sol">
-      <p class="etiqueta">Nuestra banda sonora ♪</p>
+      <p class="etiqueta">Nuestra banda sonora &#9834;</p>
 
-      <!-- Lista de canciones (se rellena desde canciones.js) -->
       <ul class="lista-canciones" id="lista-canciones"></ul>
 
-      <!-- El embed de Spotify vive aquí -->
-      <div class="spotify-wrapper">
-        <div id="spotify-embed"></div>
+      <div class="yt-wrapper">
+        <div class="yt-video" id="yt-video-wrapper">
+          <div id="yt-player"></div>
+        </div>
+
+        <div class="yt-controles" aria-label="Controles de m&uacute;sica">
+          <div class="yt-info">
+            <span class="yt-titulo" id="yt-titulo">&mdash;</span>
+            <span class="yt-tiempo" id="yt-tiempo">0:00 / 0:00</span>
+          </div>
+
+          <div class="yt-barra">
+            <input id="yt-progreso" class="yt-slider" type="range" min="0" max="100" value="0" step="0.1" aria-label="Progreso de la canci&oacute;n" />
+          </div>
+
+          <div class="yt-botones">
+            <button id="yt-prev" type="button" aria-label="Canci&oacute;n anterior">&#9198;</button>
+            <button id="yt-play" type="button" aria-label="Reproducir o pausar" class="principal">&#9654;</button>
+            <button id="yt-next" type="button" aria-label="Canci&oacute;n siguiente">&#9197;</button>
+
+            <label class="yt-volumen">
+              <span aria-hidden="true">&#9834;</span>
+              <input id="yt-vol" class="yt-slider yt-slider--volumen" type="range" min="0" max="100" value="60" aria-label="Volumen" />
+            </label>
+
+            <button id="yt-toggle-video" type="button" class="secundario" aria-pressed="false">Mostrar v&iacute;deo</button>
+          </div>
+        </div>
       </div>
+
+      <p class="aviso">Haz clic en una canci&oacute;n o en play para empezar a escuchar.</p>
     </section>
   </main>
 
   <footer>
-    Hecho con <span>♥</span> solo para ti, mi <span>Sol</span>.
+    Hecho con <span>&#9829;</span> solo para ti, mi <span>Sol</span>.
   </footer>
 
-  <!-- Librerías externas -->
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/tsparticles/2.12.0/tsparticles.bundle.min.js"
-    defer
-  ></script>
-  <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
-
-  <!-- Código de la app -->
-  <script src="front/frases.js"    defer></script>
-  <script src="front/canciones.js" defer></script>
-  <script src="front/player.js"    defer></script>
-  <script src="front/app.js"       defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tsparticles/2.12.0/tsparticles.bundle.min.js" defer></script>
+  
+  <script src="front/frases.js"></script>
+  <script src="front/canciones.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="front/player.js"></script>
+  <script src="front/app.js"></script>
 </body>
 </html>

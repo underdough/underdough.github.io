@@ -1,43 +1,31 @@
 /* =====================================================
    canciones.js
-   Lista de canciones / playlists de Spotify para Sol.
-
-   --------  CÓMO AÑADIR UNA CANCIÓN  -------------------
-   1. En Spotify (web o app), abre la canción, álbum o playlist.
-   2. Menú "..." -> Compartir -> Copiar enlace de la canción.
-      Te dará algo como:
-        https://open.spotify.com/track/3n3Ppam7vgaVa1iaRUc9Lp?si=...
-                                ^^^^^  ^^^^^^^^^^^^^^^^^^^^^^
-                                 tipo   id (lo que nos interesa)
-   3. Añade un objeto aquí con:
-        tipo   : 'track' | 'album' | 'playlist' | 'episode'
-        id     : el id de la URL
-        titulo : cómo quieres que aparezca en la lista
-
-   Ejemplos: cámbialos por las canciones reales que tú
-   quieres dedicarle a Sol.
+   Lista de canciones de YouTube para Sol.
+   
+   COMO AGREGAR CANCIONES:
+   1. Ve a YouTube y busca la cancion
+   2. Copia la URL (ej: https://www.youtube.com/watch?v=ABC123xyz)
+   3. El ID es la parte despues de "watch?v=" (ABC123xyz)
+   4. Agregalo abajo siguiendo el formato
+   
+   EJEMPLO:
+   { titulo: 'Nombre -- Artista', videoId: 'ABC123xyz' },
    ===================================================== */
 
 /* eslint-disable */
 window.CANCIONES = [
-  {
-    tipo:   'track',
-    id:     '3n3Ppam7vgaVa1iaRUc9Lp',       // Mr. Brightside — placeholder, reemplaza
-    titulo: '♡ Nuestra canción (cámbiame)'
-  },
-  {
-    tipo:   'track',
-    id:     '0tgVpDi06FyKpA1z0VMD4v',       // Perfect — placeholder, reemplaza
-    titulo: 'La que bailamos'
-  },
-  {
-    tipo:   'playlist',
-    id:     '37i9dQZF1DX50QitC6Oqtn',       // "Love Pop" de Spotify — funciona por defecto
-    titulo: 'Playlist romántica'
-  },
-  {
-    tipo:   'playlist',
-    id:     '37i9dQZF1DWYp5ynvrh2hV',       // "Boleros Románticos" — funciona por defecto
-    titulo: 'Boleros para ti'
-  }
+  // Gustavo Cerati
+  { titulo: 'Cactus -- Gustavo Cerati', videoId: 'YLdD0W1eSZk' },
+  { titulo: 'Lago en el Cielo -- Gustavo Cerati', videoId: 'MEHn16TE-_s' },
+  
+  // Soda Stereo
+  { titulo: 'Persiana Americana -- Soda Stereo', videoId: 'HGQsHjRB7Qs' },
+  { titulo: 'En la Ciudad de la Furia -- Soda Stereo', videoId: 'xAZH28KpK1E' },
+  
+  // Ariana Grande
+  { titulo: '7 rings -- Ariana Grande', videoId: 'QYh6mYIJG2Y' },
+  { titulo: 'thank u, next -- Ariana Grande', videoId: 'gl1aHhXnN1k' },
+  
+  // Agrega mas canciones aqui:
+  // { titulo: 'Nombre de la cancion -- Artista', videoId: 'ID_DEL_VIDEO' },
 ];
