@@ -19,6 +19,37 @@
   const $btnHoy      = document.getElementById('btn-hoy');
 
   let tipoActual = 'motivacional';
+  let esFraseDelDia = true;
+  let intervalFraseId = null;
+
+  let indicesMezclados = { motivacional: [], romantica: [] };
+  let punteros = { motivacional: 0, romantica: 0 };
+
+  function inicializarMezcla(tipo, total) {
+    let arr = Array.from({length: total}, (_, i) => i);
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    indicesMezclados[tipo] = arr;
+    punteros[tipo] = 0;
+  }
+
+  function iniciarRotacionFrases() {
+    detenerRotacionFrases();
+    // Cambiar cada 20 segundos (1/3 minutos)
+    intervalFraseId = setInterval(() => {
+      const frase = obtenerFraseAleatoria(tipoActual);
+      mostrarFrase(frase, true);
+    }, 20000);
+  }
+
+  function detenerRotacionFrases() {
+    if (intervalFraseId) {
+      clearInterval(intervalFraseId);
+      intervalFraseId = null;
+    }
+  }
 
   /* =====================================================
      SALUDO Y HORA DE BOGOTÁ (GMT-5)
@@ -97,7 +128,15 @@
     const lista = FRASES[tipo] || [];
     if (lista.length === 0) return { texto: 'Cargando...', autor: '' };
     
-    const indice = Math.floor(Math.random() * lista.length);
+    if (!indicesMezclados[tipo] || indicesMezclados[tipo].length !== lista.length) {
+      inicializarMezcla(tipo, lista.length);
+    }
+
+    if (punteros[tipo] >= indicesMezclados[tipo].length) {
+      inicializarMezcla(tipo, lista.length);
+    }
+
+    const indice = indicesMezclados[tipo][punteros[tipo]++];
     return lista[indice];
   }
 
@@ -147,9 +186,15 @@
         : 'Tu motivación de hoy';
     }
     
-    // Mostrar frase del día del nuevo tipo
-    const frase = obtenerFraseDelDia(tipoActual);
-    mostrarFrase(frase, true);
+    // Mostrar frase según el estado actual
+    if (esFraseDelDia) {
+      const frase = obtenerFraseDelDia(tipoActual);
+      mostrarFrase(frase, true);
+    } else {
+      const frase = obtenerFraseAleatoria(tipoActual);
+      mostrarFrase(frase, true);
+      iniciarRotacionFrases(); // Reiniciar el temporizador al cambiar de tipo
+    }
   }
 
   /* =====================================================
@@ -166,13 +211,17 @@
     
     if ($btnNueva) {
       $btnNueva.addEventListener('click', () => {
+        esFraseDelDia = false;
         const frase = obtenerFraseAleatoria(tipoActual);
         mostrarFrase(frase, true);
+        iniciarRotacionFrases();
       });
     }
     
     if ($btnHoy) {
       $btnHoy.addEventListener('click', () => {
+        esFraseDelDia = true;
+        detenerRotacionFrases();
         const frase = obtenerFraseDelDia(tipoActual);
         mostrarFrase(frase, true);
       });
