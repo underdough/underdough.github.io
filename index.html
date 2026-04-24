@@ -140,12 +140,46 @@
   <script src="widgets/widget-ios-scripteable.js"></script>
 
   <script>
-    // Registrar Service Worker para PWA
+    // Registrar Service Worker para PWA con auto-update.
     if ('serviceWorker' in navigator) {
+      let recargando = false;
+
+      // Cuando el SW nuevo toma control, recargamos una sola vez
+      // para que el usuario vea enseguida los cambios.
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (recargando) return;
+        recargando = true;
+        window.location.reload();
+      });
+
+      // El SW tambien nos avisa cuando se activa.
+      navigator.serviceWorker.addEventListener('message', (e) => {
+        if (e.data && e.data.type === 'SW_ACTIVATED') {
+          console.log('[PWA] SW activado:', e.data.cache);
+        }
+      });
+
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
+        navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' })
           .then((registration) => {
             console.log('[PWA] Service Worker registrado:', registration.scope);
+
+            // Busca updates al entrar y cada vez que la pestana vuelve a foco.
+            registration.update();
+            document.addEventListener('visibilitychange', () => {
+              if (document.visibilityState === 'visible') registration.update();
+            });
+
+            // Si aparece un SW nuevo esperando, lo activamos ya.
+            registration.addEventListener('updatefound', () => {
+              const nuevo = registration.installing;
+              if (!nuevo) return;
+              nuevo.addEventListener('statechange', () => {
+                if (nuevo.state === 'installed' && navigator.serviceWorker.controller) {
+                  nuevo.postMessage({ type: 'SKIP_WAITING' });
+                }
+              });
+            });
           })
           .catch((error) => {
             console.log('[PWA] Error al registrar Service Worker:', error);
