@@ -29,6 +29,16 @@ window.CANCIONES = [
 
   // Josean Log
   { titulo: 'Beso -- Josean Log', videoId: 'ntdwWKaGaPQ' },
+
+  // Zoé
+  { titulo: 'Corazón atómico -- Zoé', videoId: 'ayBJ8PkW9jI' },
+
+  // Airbag
+  { titulo: 'Verte de cerca -- Airbag', videoId: 'EIhGE_WEBCA' },
+
+  { titulo: 'Relámpagos -- Airbag', videoId: 'fd6uTBIS1Sg' },
+
+
   // Mas canciones - busca en YouTube y agrega el ID
   // { titulo: 'Nombre de la cancion', videoId: 'ID_DEL_VIDEO' },
 ];
