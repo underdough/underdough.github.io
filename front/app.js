@@ -31,11 +31,12 @@
       timeZone: 'America/Bogota',
       hour: 'numeric',
       minute: 'numeric',
+      seconds:'numeric',
       hour12: false
     };
     
     const horaStr = ahora.toLocaleString('es-CO', opciones);
-    const [hora, minutos] = horaStr.split(':').map(Number);
+    const [hora, minutos, segundos] = horaStr.split(':').map(Number);
     const horaDecimal = hora + (minutos / 60);
     
     // Determinar saludo según la hora
@@ -63,6 +64,7 @@
         month: 'long',
         hour: '2-digit',
         minute: '2-digit',
+        second: '2-digit',
         hour12: true
       };
       
@@ -187,55 +189,123 @@
       fullScreen: false,
       particles: {
         number: {
-          value: 60,
+          value: 100,
           density: {
             enable: true,
             area: 800
           }
         },
         color: {
-          value: ['#f7c9d3', '#e88fa3', '#d4af7a']
+          value: ['#f7c9d3', '#e88fa3', '#d4af7a', '#fce4ec']
         },
         shape: {
           type: 'circle'
         },
         opacity: {
-          value: { min: 0.1, max: 0.5 },
+          value: { min: 0.1, max: 0.6 },
           animation: {
             enable: true,
-            speed: 0.5,
+            speed: 0.8,
             sync: false
           }
         },
         size: {
-          value: { min: 1, max: 4 }
+          value: { min: 1, max: 5 },
+          animation: {
+            enable: true,
+            speed: 1.5,
+            minimumValue: 0.5,
+            sync: false
+          }
+        },
+        links: {
+          enable: true,
+          distance: 120,
+          color: '#f7c9d3',
+          opacity: 0.08,
+          width: 1
         },
         move: {
           enable: true,
-          speed: 0.5,
+          speed: 1.2,
           direction: 'none',
           random: true,
           straight: false,
-          outModes: 'out'
+          outModes: 'out',
+          attract: {
+            enable: true,
+            rotateX: 600,
+            rotateY: 1200
+          }
         }
       },
       interactivity: {
         events: {
           onHover: {
             enable: true,
-            mode: 'bubble'
+            mode: ['bubble', 'repulse'],
+            parallax: {
+              enable: true,
+              force: 40,
+              smooth: 20
+            }
           }
         },
         modes: {
           bubble: {
             distance: 150,
-            size: 6,
+            size: 8,
             duration: 2,
             opacity: 0.8
+          },
+          repulse: {
+            distance: 100,
+            duration: 0.4,
+            speed: 0.5
           }
         }
       },
       detectRetina: true
+    });
+  }
+
+  /* =====================================================
+     GALERÍA — animación al hacer scroll
+     ===================================================== */
+  function iniciarGaleria() {
+    const items = document.querySelectorAll('.galeria-item');
+    if (!items.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    items.forEach((item) => observer.observe(item));
+
+    // Click-to-play para vídeos de la galería
+    document.querySelectorAll('.galeria-item--video').forEach((item) => {
+      const video = item.querySelector('video');
+      if (!video) return;
+
+      item.addEventListener('click', () => {
+        if (video.paused) {
+          video.muted = false;
+          video.play();
+          item.classList.add('playing');
+        } else {
+          video.pause();
+          item.classList.remove('playing');
+        }
+      });
+
+      video.addEventListener('ended', () => {
+        item.classList.remove('playing');
+      });
     });
   }
 
@@ -258,6 +328,9 @@
     
     // Iniciar partículas
     setTimeout(iniciarParticulas, 100);
+
+    // Iniciar galería con scroll reveal
+    iniciarGaleria();
   }
 
   // Ejecutar cuando el DOM esté listo

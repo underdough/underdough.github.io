@@ -38,6 +38,11 @@ window.CANCIONES = [
 
   { titulo: 'Relámpagos -- Airbag', videoId: 'fd6uTBIS1Sg' },
 
+  // Milo J
+  { titulo: 'Ama de mi sol -- Milo J', videoId: 'dKVYuxTTmmA' },
+
+  { titulo: 'A VOS -- Milo J', videoId: 'IyKkj3fZX1w' },
+
 
   // Mas canciones - busca en YouTube y agrega el ID
   // { titulo: 'Nombre de la cancion', videoId: 'ID_DEL_VIDEO' },
